@@ -27,7 +27,7 @@ head(hcr_trends)
 ```
 
 
-```{r}
+```{r chloride}
 #all chloride trends
 chloride<- hcr_trends %>% 
   filter(parameter == "Chloride") %>%
@@ -48,4 +48,64 @@ summary(chloride$cPercentChangeTotal)
 summary(chloride$cAmtChangeTotal)
 
 ```
+
+
+```{r nutrients}
+ #all nutrient trends
+nutrients<- hcr_trends %>% 
+  filter(parameter == "Total Phosphorus"|
+         parameter == "Total Nitrogen"|
+         parameter == "Inorganic Nitrogen"|
+         parameter == "Ammonia"|
+         parameter == "Chlorophyll-a") %>%
+  select(siteName, parameter, timePeriod, cDirection, cPercentChangeTotal, cAmtChangeTotal, cUnits, cTrendConfidence) 
+
+#Nitrogen 
+nitrogen_all <- nutrients %>% 
+  filter(parameter == "Total Nitrogen"|
+         parameter == "Inorganic Nitrogen"|
+         parameter == "Ammonia")
+
+##Total Nitrogen
+total_n<- nutrients %>% 
+  filter(parameter == "Total Nitrogen")
+
+tn_high <- total_n %>%
+  filter(cTrendConfidence =="high")
+
+##Ammonia 
+ammonia <- nutrients %>% 
+  filter(parameter == "Ammonia")
+
+###high confidence ammonia trends
+ammonia_high <- ammonia %>%
+  filter(cTrendConfidence =="high")
+
+## Inorganic Nitrogen 
+inorg_n <- nutrients %>% 
+  filter(parameter == "Inorganic Nitrogen")
+
+inorg_n_high <- inorg_n %>%
+  filter(cTrendConfidence =="high")
+
+## Chlorophyll-a
+chl<- nutrients %>% 
+  filter(parameter == "Chlorophyll-a")
+
+chl_high <- chl %>%
+  filter(cTrendConfidence =="high")
+
+##Total Phosphorus 
+t_phos <- nutrients %>% 
+  filter(parameter == "Total Phosphorus")
+
+t_phos_high <- t_phos %>% 
+  filter(cTrendConfidence == "high")
+
+```
+
+
+
+
+
 
