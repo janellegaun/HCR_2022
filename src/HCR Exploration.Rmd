@@ -152,6 +152,7 @@ metal_pb<-metals%>%
 ggplot(metal_pb, aes(x =siteName, y =cAmtChangeTotal))+
   geom_point(aes(color= cTrendConfidence))
 
+
 ## Total Mercury
 metal_hg <-  metals%>% 
   filter(parameter == "Total Mercury")
