@@ -1,0 +1,51 @@
+---
+title: "HCR Exploration"
+author: "JGaun"
+date: "2/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+```
+
+
+#### Load the Data
+
+Data from Erin January 2022
+
+```{r}
+hcr_trends <- read_csv(here("data", "HCR_SummarizedResultsFinal_Jan2022.csv"))
+
+#order sites from upstream to downstream
+hcr_trends$siteName <- as.factor(hcr_trends$siteName)
+factor(hcr_trends$siteName, levels = c("Pool4A", "Pool4B", "Pool5_6", "Pool8", "LD9", "LD11", "Pool13", "LD15", "LD17", "LD19", "LD21", "LD24", "Pool26", "OpenRiver", "J-36", "I-05", "LaGrange" ))
+
+head(hcr_trends)
+```
+
+
+```{r}
+#all chloride trends
+chloride<- hcr_trends %>% 
+  filter(parameter == "Chloride") %>%
+  select(siteName, timePeriod, cDirection, cPercentChangeTotal, cAmtChangeTotal, cUnits, cTrendConfidence) 
+
+#hgh confidence chloride trends
+chloride_high <- hcr_trends %>% 
+  filter(parameter == "Chloride") %>%
+  select(siteName, timePeriod, cDirection, cPercentChangeTotal, cAmtChangeTotal, cUnits, cTrendConfidence) %>% 
+  filter(cTrendConfidence =="high") 
+
+#summary high confidence chloride trends
+summary(chloride_high$cPercentChangeTotal)
+summary(chloride_high$cAmtChangeTotal)
+
+#summary all chloride trends
+summary(chloride$cPercentChangeTotal)
+summary(chloride$cAmtChangeTotal)
+
+```
+
