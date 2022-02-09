@@ -21,6 +21,7 @@ hcr_trends <- read_csv(here("data", "HCR_SummarizedResultsFinal_Jan2022.csv"))
 
 #order sites from upstream to downstream
 hcr_trends$siteName <- as.factor(hcr_trends$siteName)
+
 factor(hcr_trends$siteName, levels = c("Pool4A", "Pool4B", "Pool5_6", "Pool8", "LD9", "LD11", "Pool13", "LD15", "LD17", "LD19", "LD21", "LD24", "Pool26", "OpenRiver", "J-36", "I-05", "LaGrange" ))
 
 head(hcr_trends)
@@ -104,6 +105,45 @@ t_phos_high <- t_phos %>%
 
 ```
 
+```{r metals}
+ #all nutrient trends
+metals<- hcr_trends %>% 
+  filter(parameter == "Total Aluminum"|
+         parameter == "Total Arsenic"|
+         parameter == "Total Copper"|
+         parameter == "Total Cadmium"|
+         parameter == "Total Lead" |
+         parameter == "Total Mercury") %>%
+  select(siteName, parameter, timePeriod, cDirection, cPercentChangeTotal, cAmtChangeTotal, cUnits, cTrendConfidence) 
+
+factor(metals$siteName, levels = c("Pool4A", "Pool4B", "Pool5_6", "Pool8", "LD9", "LD11", "Pool13", "LD15", "LD17", "LD19", "LD21", "LD24", "Pool26", "OpenRiver", "J-36", "I-05", "LaGrange" ))
+
+#Aluminum 
+metal_al<- metals%>% 
+  filter(parameter == "Total Aluminum")
+
+##Total Arsenic
+metal_ar <- metals%>% 
+  filter(parameter == "Total Arsenic")
+
+## Total Copper
+metal_cu<-metals%>% 
+  filter(parameter == "Total Copper")
+
+## Total Cadmium
+metal_cd<-metals%>% 
+  filter(parameter == "Total Cadmium")
+
+## Total Lead
+metal_pb<-metals%>% 
+  filter(parameter == "Total Lead")
+
+## Total Mercury
+metal_hg <-  metals%>% 
+  filter(parameter == "Total Mercury")
+
+
+```
 
 
 
