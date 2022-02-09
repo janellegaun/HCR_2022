@@ -16,13 +16,16 @@ library(tidyverse)
 
 Data from Erin January 2022
 
-```{r}
+```{r load data and create factor levels for sites}
 hcr_trends <- read_csv(here("data", "HCR_SummarizedResultsFinal_Jan2022.csv"))
 
 #order sites from upstream to downstream
 hcr_trends$siteName <- as.factor(hcr_trends$siteName)
 
 factor(hcr_trends$siteName, levels = c("Pool4A", "Pool4B", "Pool5_6", "Pool8", "LD9", "LD11", "Pool13", "LD15", "LD17", "LD19", "LD21", "LD24", "Pool26", "OpenRiver", "J-36", "I-05", "LaGrange" ))
+
+hcr_trends <- hcr_trends %>% 
+  mutate(siteName = fct_relevel(siteName,"Pool4A", "Pool4B", "Pool5_6", "Pool8", "LD9", "LD11", "Pool13", "LD15", "LD17", "LD19", "LD21", "LD24", "Pool26", "OpenRiver", "J-36", "I-05", "LaGrange"))
 
 head(hcr_trends)
 ```
@@ -50,7 +53,7 @@ summary(chloride$cAmtChangeTotal)
 
 ```
 
-
+#### Nutrients
 ```{r nutrients}
  #all nutrient trends
 nutrients<- hcr_trends %>% 
@@ -59,7 +62,7 @@ nutrients<- hcr_trends %>%
          parameter == "Inorganic Nitrogen"|
          parameter == "Ammonia"|
          parameter == "Chlorophyll-a") %>%
-  select(siteName, parameter, timePeriod, cDirection, cPercentChangeTotal, cAmtChangeTotal, cUnits, cTrendConfidence) 
+  select(siteName, parameter, timePeriod, cDirection, cPercentChangeTotal, cAmtChangeTotal, cUnits, cTrendConfidence)
 
 #Nitrogen 
 nitrogen_all <- nutrients %>% 
@@ -72,14 +75,6 @@ total_n<- nutrients %>%
   filter(parameter == "Total Nitrogen")
 
 tn_high <- total_n %>%
-  filter(cTrendConfidence =="high")
-
-##Ammonia 
-ammonia <- nutrients %>% 
-  filter(parameter == "Ammonia")
-
-###high confidence ammonia trends
-ammonia_high <- ammonia %>%
   filter(cTrendConfidence =="high")
 
 ## Inorganic Nitrogen 
@@ -103,6 +98,22 @@ t_phos <- nutrients %>%
 t_phos_high <- t_phos %>% 
   filter(cTrendConfidence == "high")
 
+```
+
+```{r ammonia}
+##Ammonia 
+ammonia <- nutrients %>% 
+  filter(parameter == "Ammonia")
+
+ggplot(ammonia, aes(x =siteName, y =cPercentChangeTotal))+
+  geom_point(aes(color= cTrendConfidence))
+
+###high confidence ammonia trends
+ammonia_high <- ammonia %>%
+  filter(cTrendConfidence =="high")
+
+summary(ammonia_high$cPercentChangeTotal)
+summary(ammonia_high$cAmtChangeTotal)
 ```
 
 ```{r metals}
@@ -138,13 +149,19 @@ metal_cd<-metals%>%
 metal_pb<-metals%>% 
   filter(parameter == "Total Lead")
 
+ggplot(metal_pb, aes(x =siteName, y =cAmtChangeTotal))+
+  geom_point(aes(color= cTrendConfidence))
+
 ## Total Mercury
 metal_hg <-  metals%>% 
   filter(parameter == "Total Mercury")
 
-
 ```
 
+
+```{r}
+
+```
 
 
 
