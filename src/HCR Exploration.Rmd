@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(here)
 library(tidyverse)
+library(janitor)
 library(plotly)
 library(patchwork)
 ```
@@ -36,7 +37,6 @@ hcr_trends <- hcr_trends %>%
 head(hcr_trends)
 ```
 
-
 ```{r chloride}
 #all chloride trends
 chloride<- hcr_trends %>% 
@@ -49,6 +49,18 @@ chloride_high <- hcr_trends %>%
   select(siteName, timePeriod, cDirection, cPercentChangeTotal, cAmtChangeTotal, cUnits, cTrendConfidence) %>% 
   filter(cTrendConfidence =="high") 
 
+
+#plot chloride trends
+ggplot(chloride, aes(x =siteName, y =cPercentChangeTotal))+
+  geom_point(aes(color= cTrendConfidence))+
+  scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
+  scale_y_continuous(limits = c(-100, 100))+
+  theme(axis.text.x = element_text(angle= 45))+
+  labs(title = "Chloride Percent Change in Concentration",
+       y = "Percent Change in Concentration",
+       x = "Site")
+
 #summary high confidence chloride trends
 summary(chloride_high$cPercentChangeTotal)
 summary(chloride_high$cAmtChangeTotal)
@@ -57,6 +69,38 @@ summary(chloride_high$cAmtChangeTotal)
 summary(chloride$cPercentChangeTotal)
 summary(chloride$cAmtChangeTotal)
 
+```
+
+```{r sulfate}
+sulfate<- hcr_trends %>% 
+  filter(parameter == "Sulfate") %>%
+  select(siteName, timePeriod, cDirection, cPercentChangeTotal, cAmtChangeTotal, cUnits, cTrendConfidence) 
+
+#hgh confidence chloride trends
+sulfate_high <- hcr_trends %>% 
+  filter(parameter == "Sulfate") %>%
+  select(siteName, timePeriod, cDirection, cPercentChangeTotal, cAmtChangeTotal, cUnits, cTrendConfidence) %>% 
+  filter(cTrendConfidence =="high") 
+
+
+#plot chloride trends
+ggplot(sulfate, aes(x =siteName, y =cPercentChangeTotal))+
+  geom_point(aes(color= cTrendConfidence))+
+  scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
+  scale_y_continuous(limits = c(-100, 100))+
+  theme(axis.text.x = element_text(angle= 45))+
+  labs(title = "Sulfate Percent Change in Concentration",
+       y = "Percent Change in Concentration",
+       x = "Site")
+
+#summary high confidence chloride trends
+summary(sulfate_high$cPercentChangeTotal)
+summary(sulfate_high$cAmtChangeTotal)
+
+#summary all chloride trends
+summary(sulfate$cPercentChangeTotal)
+summary(sulfate$cAmtChangeTotal)
 ```
 
 #### Nutrients
@@ -69,6 +113,20 @@ nutrients<- hcr_trends %>%
          parameter == "Ammonia"|
          parameter == "Chlorophyll-a") %>%
   select(siteName, parameter, timePeriod, cDirection, cPercentChangeTotal, cAmtChangeTotal, cUnits, cTrendConfidence)
+
+#all nutrients by site
+ggplot(nutrients, aes(x =siteName, y =cPercentChangeTotal))+
+  geom_point(aes(color= cTrendConfidence))+
+  facet_wrap(~parameter, ncol = 3)+
+  scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
+  scale_y_continuous(limits = c(-100, 100))+
+  theme(axis.text.x = element_text(angle= 90, size = 6))+
+  labs(title = "Total Nitrogen Percent Change in Concentration",
+       y = "Percent Change in Concentration",
+       x = "Site")
+
+
 
 #Nitrogen 
 nitrogen_all <- nutrients %>% 
@@ -83,8 +141,8 @@ total_n<- nutrients %>%
 ggplot(total_n, aes(x =siteName, y =cPercentChangeTotal))+
   geom_point(aes(color= cTrendConfidence))+
   scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
-  geom_hline(yintercept = 0, size =1, color = "black")+
-  scale_y_continuous(limits = c(-20, 20))+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
+  scale_y_continuous(limits = c(-100, 100))+
   theme(axis.text.x = element_text(angle= 45))+
   labs(title = "Total Nitrogen Percent Change in Concentration",
        y = "Percent Change in Concentration",
@@ -100,8 +158,8 @@ inorg_n <- nutrients %>%
 ggplot(inorg_n, aes(x =siteName, y =cPercentChangeTotal))+
   geom_point(aes(color= cTrendConfidence))+
   scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
-  geom_hline(yintercept = 0, size =1, color = "black")+
-  scale_y_continuous(limits = c(-20, 20))+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
+  scale_y_continuous(limits = c(-100, 100))+
   theme(axis.text.x = element_text(angle= 45))+
   labs(title = "Inorganic Nitrogen Percent Change in Concentration",
        y = "Percent Change in Concentration",
@@ -117,7 +175,7 @@ chl<- nutrients %>%
 ggplot(chl, aes(x =siteName, y =cPercentChangeTotal))+
   geom_point(aes(color= cTrendConfidence))+
   scale_color_manual(values=c("#999999", "#E69F00"))+
-  geom_hline(yintercept = 0, size =1, color = "black")+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
   scale_y_continuous(limits = c(-100, 100))+
   theme(axis.text.x = element_text(angle= 45))+
   labs(title = "Chlorophyll-a Percent Change in Concentration",
@@ -129,12 +187,14 @@ chl_high <- chl %>%
 
 ##Total Phosphorus 
 t_phos <- nutrients %>% 
-  filter(parameter == "Total Phosphorus")
+  filter(parameter == "Total Phosphorus") %>% 
+  na.omit()
+  
 
 ggplot(t_phos, aes(x =siteName, y =cPercentChangeTotal))+
   geom_point(aes(color= cTrendConfidence))+
   scale_color_manual(values=c("#999999", "#E69F00"))+
-  geom_hline(yintercept = 0, size =1, color = "black")+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
   scale_y_continuous(limits = c(-100, 100))+
   theme(axis.text.x = element_text(angle= 45))+
   labs(title = "Total Phosphorus Percent Change in Concentration",
@@ -142,7 +202,20 @@ ggplot(t_phos, aes(x =siteName, y =cPercentChangeTotal))+
        x = "Site")
 
 t_phos_high <- t_phos %>% 
-  filter(cTrendConfidence == "high")
+  filter(cTrendConfidence == "high") %>% 
+  filter(siteName != "Pool26")
+
+ggplot(t_phos_high, aes(x =siteName, y =cPercentChangeTotal))+
+  geom_point(aes(color= cTrendConfidence))+
+  scale_color_manual(values=c("#E69F00"))+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
+  scale_y_continuous(limits = c(-100, 100))+
+  theme(axis.text.x = element_text(angle= 45))+
+  labs(title = "Total Phosphorus Percent Change in Concentration",
+       y = "Percent Change in Concentration",
+       x = "Site")
+
+summary(t_phos_high$cPercentChangeTotal)
 
 ```
 
@@ -154,7 +227,7 @@ ammonia <- nutrients %>%
 ggplot(ammonia, aes(x =siteName, y =cPercentChangeTotal))+
   geom_point(aes(color= cTrendConfidence))+
   scale_color_manual(values=c("#999999", "#E69F00"))+
-  geom_hline(yintercept = 0, size =1, color = "black")+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
   scale_y_continuous(limits = c(-150, 150))+
   theme(axis.text.x = element_text(angle= 45))+
   labs(title = "Ammonia Percent Change in Concentration",
@@ -188,7 +261,7 @@ metal_al<- metals%>%
 ggplot(metal_al, aes(x =siteName, y =cPercentChangeTotal))+
   geom_point(aes(color= cTrendConfidence))+
   scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
-  geom_hline(yintercept = 0, size =1, color = "black")+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
   scale_y_continuous(limits = c(-100, 100))+
   theme(axis.text.x = element_text(angle= 45))+
   labs(title = "Total Aluminum Percent Change in Concentration",
@@ -202,7 +275,7 @@ metal_ar <- metals%>%
 ggplot(metal_ar, aes(x =siteName, y =cPercentChangeTotal))+
   geom_point(aes(color= cTrendConfidence))+
   scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
-  geom_hline(yintercept = 0, size =1, color = "black")+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
   scale_y_continuous(limits = c(-100, 100))+
   theme(axis.text.x = element_text(angle= 45))+
   labs(title = "Total Arsenic Percent Change in Concentration",
@@ -216,7 +289,7 @@ metal_cu<-metals%>%
 ggplot(metal_cu, aes(x =siteName, y =cPercentChangeTotal))+
   geom_point(aes(color= cTrendConfidence))+
   scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
-  geom_hline(yintercept = 0, size =1, color = "black")+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
   scale_y_continuous(limits = c(-100, 100))+
   theme(axis.text.x = element_text(angle= 45))+
   labs(title = "Total Copper Percent Change in Concentration",
@@ -234,7 +307,7 @@ metal_pb<-metals%>%
 ggplot(metal_pb, aes(x =siteName, y =cPercentChangeTotal))+
   geom_point(aes(color= cTrendConfidence))+
   scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
-  geom_hline(yintercept = 0, size =1, color = "black")+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
   scale_y_continuous(limits = c(-450, 450))+
   theme(axis.text.x = element_text(angle= 45))+
   labs(title = "Total Lead Percent Change in Concentration",
@@ -267,7 +340,7 @@ ggplot(tss, aes(x =siteName, y =cPercentChangeTotal))+
   geom_point(aes(color= cTrendConfidence))+
   scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
   scale_y_continuous(limits= c(-100, 100))+
-  geom_hline(yintercept = 0, size =1, color = "black")+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
   theme(axis.text.x = element_text(angle= 45))+
   labs(title = "Total Suspended Solids Percent Change in Concentration",
        y = "Percent Change in Concentration",
@@ -275,6 +348,22 @@ ggplot(tss, aes(x =siteName, y =cPercentChangeTotal))+
 
 ```
 
+```{r LD15}
+ld_15 <- hcr_trends %>% 
+  filter(siteName == "LD15")
+
+#all nutrients by site
+ggplot(ld_15, aes(x =parameter, y =cPercentChangeTotal))+
+  geom_point(aes(color= cTrendConfidence))+
+  scale_color_manual(values=c("#999999", "#56B4E9", "#E69F00"))+
+  geom_hline(yintercept = 0, size =.25, color = "black")+
+  scale_y_continuous(limits = c(-100, 500))+
+  theme(axis.text.x = element_text(angle= 90, size = 6))+
+  labs(title = "Total Nitrogen Percent Change in Concentration",
+       y = "Percent Change in Concentration",
+       x = "Site")
+  
+```
 
 
 
